@@ -17,7 +17,7 @@ namespace TCPServertest1
         static void Main(string[] args)
         {
 
-           // IPAddress AddressIP = IPAddress.Parse("127.0.0.1");
+            // IPAddress AddressIP = IPAddress.Parse("127.0.0.1");
             int Port = 8888;
             TcpListener serverSocket = new TcpListener(/*AddressIP,*/Port);
 
@@ -27,65 +27,140 @@ namespace TCPServertest1
 
             serverSocket.Start();
 
-            Console.WriteLine(" >> Server Started");
+            //Console.WriteLine(" >> Server Started");
 
-            clientSocket = serverSocket.AcceptTcpClient();
+            //clientSocket = serverSocket.AcceptTcpClient();
 
-            Console.WriteLine(" >> Accept connection from client");
+            //Console.WriteLine(" >> Accept connection from client");
 
             requestCount = 0;
 
-            while ((true))
+            try
             {
-
-                try
+                while ((true))
                 {
 
+
                     requestCount = requestCount + 1;
+
+                    //@@
+                    Console.WriteLine(" >> Server Started");
+
+                    clientSocket = serverSocket.AcceptTcpClient();
+
+                    Console.WriteLine(" >> Accept connection from client");
+
+                    //@@
 
                     NetworkStream networkStream = clientSocket.GetStream();
 
                     byte[] bytesFrom = new byte[10025];
+                    string serverResponse = "";
 
-                    networkStream.Read(bytesFrom, 0, (int)clientSocket.ReceiveBufferSize);
+                    int i;
 
-                    string dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
+                    // Loop to receive all the data sent by the client.
+                    while ((i = networkStream.Read(bytesFrom, 0, (int)clientSocket.ReceiveBufferSize)) != 0)
+                    {
+                        // networkStream.Read(bytesFrom, 0, (int)clientSocket.ReceiveBufferSize);
 
-                   // dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+                        string dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom, 0, i);
 
-                    Console.WriteLine(" >> Data from client - " + dataFromClient);
+                        Console.WriteLine(" >> Data from client - " + dataFromClient);
 
-                    string serverResponse = "Last Message from client \n" + dataFromClient;
+                        serverResponse = "Last Message send to client \n" + dataFromClient;
 
-                    Byte[] sendBytes = Encoding.ASCII.GetBytes(serverResponse);
+                        Byte[] sendBytes = Encoding.ASCII.GetBytes(dataFromClient);
+                        networkStream.Write(sendBytes, 0, sendBytes.Length);
 
-                    networkStream.Write(sendBytes, 0, sendBytes.Length);
-
+                        Console.WriteLine(" >> " + serverResponse);
+                    }
                     networkStream.Flush();
 
-                    Console.WriteLine(" >> " + serverResponse);
+                    //Console.WriteLine(" >> " + serverResponse);
 
+                    // clientSocket.Close();
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
 
-                catch (Exception ex)
-                {
-
-                    Console.WriteLine(ex.ToString());
-
-                }
-                finally
-                {
-
-                }
-                
-   //            Console.ReadKey();
+            }
+            finally
+            {
+                serverSocket.Stop();
+                // clientSocket.Close();
             }
 
-            Console.ReadKey();
+
+
+            //         while ((true))
+            //         {
+
+            //             try
+            //             {
+
+            //                 requestCount = requestCount + 1;
+
+            //                 //@@
+            //                 Console.WriteLine(" >> Server Started");
+
+            //                 clientSocket = serverSocket.AcceptTcpClient();
+
+            //                 Console.WriteLine(" >> Accept connection from client");
+
+            //                 //@@
+
+            //                 NetworkStream networkStream = clientSocket.GetStream();
+
+            //                 byte[] bytesFrom = new byte[10025];
+
+            //                 networkStream.Read(bytesFrom, 0, (int)clientSocket.ReceiveBufferSize);
+
+            //                 string dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
+
+            //                // dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+
+            //                 Console.WriteLine(" >> Data from client - " + dataFromClient);
+
+            //                 string serverResponse = "Last Message from client \n" + dataFromClient;
+            //                // string ggg = "000211";
+            //                 string ggg = dataFromClient;
+
+            //                 Byte[] sendBytes = Encoding.ASCII.GetBytes(ggg);
+
+
+            //                 //Encoding.ASCII.GetBytes(serverResponse);
+
+            //                 networkStream.Write(sendBytes, 0, sendBytes.Length);
+            //               //  networkStream.Write(bytesFrom, 0, bytesFrom.Length);
+
+            //                 networkStream.Flush();
+
+            //                 Console.WriteLine(" >> " + serverResponse);
+
+            //             }
+
+            //             catch (Exception ex)
+            //             {
+
+            //                 Console.WriteLine(ex.ToString());
+
+            //             }
+            //             finally
+            //             {
+
+            //             }
+
+            ////            Console.ReadKey();
+            //         }
+
+            // Console.ReadKey();
 
             clientSocket.Close();
 
-            serverSocket.Stop();
+            //  serverSocket.Stop();
 
             Console.WriteLine(" >> exit");
 
